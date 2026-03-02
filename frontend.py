@@ -1,8 +1,10 @@
-import customtkinter as ctk   # biblioteca para visual moderno
-import tkinter as tk          # (neste caso) adaptar recursos para janela popup
-import ctypes                 # acesso aos recursos do sistema operacional
-import sys                    # acesso à variáveis do sistema
-import os                     # acesso aos diretórios
+import customtkinter as ctk       # biblioteca para visual moderno
+import tkinter as tk              # (neste caso) adaptar recursos para janela popup
+import ctypes                     # acesso aos recursos do sistema operacional
+import sys                        # acesso à variáveis do sistema
+import os                         # acesso aos diretórios
+
+from backend import InserirDado, SelecionarLinha   # importando funções externas (arquivo backend.py)
 
 ctk.set_appearance_mode("dark")  # definindo aparência
 
@@ -131,7 +133,6 @@ class Interface(ctk.CTk):
 
         # Inserindo ícone:
         GerenciadorIcone.apply_icon(self)
-        self._icon_photoimage = None
 
         # Contruindo o frame principal:
         self.frame_principal = ctk.CTkFrame(master=self)
@@ -174,9 +175,17 @@ class Interface(ctk.CTk):
         self.area_dados = ctk.CTkTextbox(
             master=self.frame_principal,
             border_color="#575151",
-            border_width=2
+            border_width=2,
+            state="disabled"  # desabilita entrada manual de dados
         )
         self.area_dados.grid(row=2, column=1, padx=10, pady=(18, 20), sticky="nsew")  # todas as direções
+        self.area_dados.bind("<Button-1>", lambda event: SelecionarLinha.selecionar(event, self.area_dados))  # ligando evento à função
+        self.area_dados.bind("<Motion>", self.alterar_cursor)  # alterar cursor na seleção
+
+        # Remover seleção ao clicar fora do textbox
+        self.bind_all("<Button-1>", self.remover_selecao, add="+")
+        # add="+" mantém outros binds funcionando normalmente
+
 
         # Criando um frame lateral para os botões:
         self.frame_botoes = ctk.CTkFrame(
@@ -193,7 +202,8 @@ class Interface(ctk.CTk):
             master=self.frame_botoes,
             text="Inserir",
             width=100,
-            height=28
+            height=28,
+            command=lambda: InserirDado.inserir(self.entrada_dados, self.area_dados)  # especifica a classe, aciona a função e passa os objetos
         )
         self.btn_1.grid(row=0, column=0, pady=5, sticky="ew")  # expande horizontalmente
 
@@ -229,12 +239,8 @@ class Interface(ctk.CTk):
             master=self.frame_principal,
             fg_color="transparent"
         )
-        self.frame_link.grid(row=2, column=2, rowspan=2, sticky="se", padx=15, pady=5)
+        self.frame_link.grid(row=2, column=2, sticky="se", padx=15, pady=5)
 
-        # Configurando grid interna do frame do link:
-        self.frame_link.grid_columnconfigure(0, weight=1)
-
-        
         # Link para janela de informação
         self.info_sobre = ctk.CTkLabel(
             master=self.frame_link,
@@ -245,6 +251,30 @@ class Interface(ctk.CTk):
         )
         self.info_sobre.grid(row=3, column=3, sticky="se", padx=15, pady=5)
         self.info_sobre.bind("<Button-1>", lambda e: Popup(self))  # abre janela popup
+
+    def remover_selecao(self, event):
+        # Descobre qual widget está exatamente na posição clicada:
+        widget_clicado = self.winfo_containing(event.x_root, event.y_root)
+
+        # Se o clique 'não' foi dentro do area_dados, remove a seleção:
+        if widget_clicado is None or not str(widget_clicado).startswith(str(self.area_dados)):
+            self.area_dados.tag_remove("selecionado", "1.0", "end")
+
+    def alterar_cursor(self, event):
+        # Pega índice da posição atual do mouse:
+        index = self.area_dados.index(f"@{event.x},{event.y}")
+        linha = index.split(".")[0]
+
+        inicio = f"{linha}.0"
+        fim = f"{linha}.0 lineend"
+
+        texto_linha = self.area_dados.get(inicio, fim)
+
+        # Se houver texto na linha, mostra mão:
+        if texto_linha.strip():
+            self.area_dados.configure(cursor="hand2")
+        else:
+            self.area_dados.configure(cursor="arrow")
         
 
 if __name__ == "__main__":
