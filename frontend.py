@@ -4,7 +4,7 @@ import ctypes                     # acesso aos recursos do sistema operacional
 import sys                        # acesso à variáveis do sistema
 import os                         # acesso aos diretórios
 
-from backend import InserirDado, SelecionarLinha   # importando funções externas (arquivo backend.py)
+from backend import InserirDado, SelecionarLinha, ExcluirDado   # importando funções externas (arquivo backend.py)
 
 ctk.set_appearance_mode("dark")  # definindo aparência
 
@@ -230,7 +230,8 @@ class Interface(ctk.CTk):
             master=self.frame_botoes,
             text="Excluir",
             width=100,
-            height=28
+            height=28,
+            command=lambda: ExcluirDado.excluir(self.area_dados)
         )
         self.btn_4.grid(row=3, column=0, pady=5, sticky="ew")  #  "            "
 

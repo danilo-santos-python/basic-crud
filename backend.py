@@ -52,3 +52,37 @@ class SelecionarLinha():  # selecionar dado inserido
     @staticmethod
     def limpar_selecao(area_dados):
         area_dados.tag_remove("selecionado", "1.0", "end")
+
+class ExcluirDado():  # excluir = btn_4
+    @staticmethod
+    def excluir(area_dados):
+
+        ranges = area_dados.tag_ranges("selecionado")
+
+        if not ranges:
+            print("Nenhuma linha selecionada.")
+            return
+
+        inicio = ranges[0]
+        linha = str(inicio).split(".")[0]
+
+        inicio_linha = f"{linha}.0"
+        fim_texto = f"{linha}.0 lineend"
+        fim_linha = f"{linha}.0 lineend +1c"
+
+        # Captura o texto antes de excluir:
+        texto_excluido = area_dados.get(inicio_linha, fim_texto).strip()
+
+        # Habilita temporariamente:
+        area_dados.configure(state="normal")
+
+        # Remove a linha inteira:
+        area_dados.delete(inicio_linha, fim_linha)
+
+        # Remove tag:
+        area_dados.tag_remove("selecionado", "1.0", "end")
+
+        # Desabilita novamente:
+        area_dados.configure(state="disabled")
+
+        print(f"Excluído: {texto_excluido}")
