@@ -7,6 +7,7 @@ class InserirDado():  # inserir = btn_1
         texto = entrada_dados.get().strip()  # captura e remove espaços extras
 
         if not texto:
+            print("Nada inserido no campo.")
             return  # evita inserir vazio
 
         # Libera temporariamente para inserção:

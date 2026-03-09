@@ -56,7 +56,7 @@ class Popup(tk.Toplevel):
 
         self.protocol("WM_DELETE_WINDOW", self.fecha_popup)  # devolve domínio para janela principal
 
-        # Configuração de tamanho:
+        # Configuração de tamanho-centralização:
         popup_width, popup_height = 350, 180
 
         tela_width = self.winfo_screenwidth()
@@ -120,6 +120,75 @@ class Popup(tk.Toplevel):
         )
 
     def fecha_popup(self):
+        self.grab_release()
+        self.destroy()
+
+class PopupEditar(tk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
+
+        # Janela:
+        self.title("Editar")
+        self.attributes("-topmost", True)
+        self.configure(bg="#2C2C2C")
+
+        # Ativando barra própria:
+        if sys.platform.startswith("win"):
+            self.after(10, self.ativar_dark_titlebar_edit)
+
+        # Bloquear interface:
+        self.transient(master)
+        self.grab_set()
+        self.focus_force()
+
+        self.protocol("WM_DELETE_WINDOW", self.fecha_popup_edit)  # volta interatividade da interface
+
+        # Configuração de tamanho-centralização:
+        popup_width, popup_height = 350, 120
+
+        tela_width = self.winfo_screenwidth()
+        tela_height = self.winfo_screenheight()
+        x = (tela_width // 2) - (popup_width // 2)
+        y = (tela_height // 2) - (popup_height // 2)
+
+        self.geometry(f"{popup_width}x{popup_height}+{x}+{y}")
+        self.resizable(False, False)
+
+        # Aplica ícone:
+        GerenciadorIcone.apply_icon(self)
+
+        # Desabilita botões (minimizar-maximizar)
+        if sys.platform.startswith("win"):
+            GWL_STYLE = -16
+            WS_MINIMIZEBOX = 0x00020000
+            WS_MAXIMIZEBOX = 0x00010000
+            hwnd = ctypes.windll.user32.GetParent(self.winfo_id())
+            style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_STYLE)
+            style &= ~WS_MINIMIZEBOX
+            style &= ~WS_MAXIMIZEBOX
+            ctypes.windll.user32.SetWindowLongW(hwnd, GWL_STYLE, style)
+            ctypes.windll.user32.SetWindowPos(
+                hwnd, 0, 0, 0, 0, 0,
+                0x0002 | 0x0001 | 0x0040 | 0x0020
+            )
+
+    # Função da aparência própria:
+    def ativar_dark_titlebar_edit(self):
+        self.update()
+        hwnd = ctypes.windll.user32.GetParent(self.winfo_id())
+
+        DWMWA_USE_IMMERSIVE_DARK_MODE = 20
+        valor = ctypes.c_int(1)
+
+        ctypes.windll.dwmapi.DwmSetWindowAttribute(
+            hwnd,
+            DWMWA_USE_IMMERSIVE_DARK_MODE,
+            ctypes.byref(valor),
+            ctypes.sizeof(valor)
+        )
+
+    # Função de interatividade popup editar-interface
+    def fecha_popup_edit(self):
         self.grab_release()
         self.destroy()
 
@@ -221,7 +290,8 @@ class Interface(ctk.CTk):
             master=self.frame_botoes,
             text="Editar",
             width=100,
-            height=28
+            height=28,
+            command=lambda: PopupEditar(self)  # abre popup editar
         )
         self.btn_3.grid(row=2, column=0, pady=5, sticky="ew")  #  "            "
 
