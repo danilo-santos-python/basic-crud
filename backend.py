@@ -54,6 +54,9 @@ class SelecionarLinha():  # selecionar dado inserido
     def limpar_selecao(area_dados):
         area_dados.tag_remove("selecionado", "1.0", "end")
 
+class EditarDado():
+    pass
+
 class ExcluirDado():  # excluir = btn_4
     @staticmethod
     def excluir(area_dados):

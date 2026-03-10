@@ -4,7 +4,7 @@ import ctypes                     # acesso aos recursos do sistema operacional
 import sys                        # acesso à variáveis do sistema
 import os                         # acesso aos diretórios
 
-from backend import InserirDado, SelecionarLinha, ExcluirDado   # importando funções externas (arquivo backend.py)
+from backend import InserirDado, SelecionarLinha, EditarDado, ExcluirDado   # importando funções externas (arquivo backend.py)
 
 ctk.set_appearance_mode("dark")  # definindo aparência
 
@@ -124,13 +124,17 @@ class Popup(tk.Toplevel):
         self.destroy()
 
 class PopupEditar(tk.Toplevel):
-    def __init__(self, master):
+    def __init__(self, master, area_dados):
         super().__init__(master)
+
+        self.area_dados = area_dados # referencia do textbox
 
         # Janela:
         self.title("Editar")
         self.attributes("-topmost", True)
         self.configure(bg="#2C2C2C")
+
+        self.verificar_texto() # vinculando operação desta função nesta classe
 
         # Ativando barra própria:
         if sys.platform.startswith("win"):
@@ -191,6 +195,11 @@ class PopupEditar(tk.Toplevel):
     def fecha_popup_edit(self):
         self.grab_release()
         self.destroy()
+
+    # Verificar texto no TextBox "area_dados":
+    def verificar_texto(self):
+        if not self.area_dados.get("1.0", "end").strip():
+            print("Sem dados para editar.")
 
 class Interface(ctk.CTk):
     def __init__(self):
@@ -291,7 +300,7 @@ class Interface(ctk.CTk):
             text="Editar",
             width=100,
             height=28,
-            command=lambda: PopupEditar(self)  # abre popup editar
+            command=lambda: PopupEditar(self, self.area_dados)  # abre popup editar
         )
         self.btn_3.grid(row=2, column=0, pady=5, sticky="ew")  #  "            "
 
