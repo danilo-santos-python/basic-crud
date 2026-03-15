@@ -36,6 +36,80 @@ class GerenciadorIcone():
             except Exception as e:
                 print("Falha ao aplicar .png:", e)
 
+class AlertaDados(tk.Toplevel):
+    def __init__(self, master, mensagem = ""):
+        super().__init__(master)
+
+        self.title("Alerta!")
+        self.attributes("-topmost", True)
+        self.configure(bg="#2C2C2C")
+
+        self.mensagem_alerta = ctk.CTkLabel(
+            master=self,
+            text=mensagem,
+            text_color="#FFFFFF"
+        )
+        self.mensagem_alerta.pack(pady=(30, 2))
+
+        # Ativa barra de título escura (Windows):
+        if sys.platform.startswith("win"):
+            self.after(10, self.ativar_dark_titlebar_alerta)
+
+        # Configuração para bloquear interface:
+        self.transient(master)
+        self.grab_set()
+        self.focus_force()
+
+        self.protocol("WM_DELETE_WINDOW", self.fecha_popup_alerta)  # devolve domínio para janela principal
+
+        # Configuração de tamanho-centralização:
+        popup_width, popup_height = 350, 100
+
+        tela_width = self.winfo_screenwidth()
+        tela_height = self.winfo_screenheight()
+        x = (tela_width // 2) - (popup_width // 2)
+        y = (tela_height // 2) - (popup_height // 2)
+
+        self.geometry(f"{popup_width}x{popup_height}+{x}+{y}")
+        self.resizable(False, False)
+
+        # Inserir ícone na barra de título:
+        GerenciadorIcone.apply_icon(self)
+
+        # Remove minimizar/maximizar (Windows)
+        if sys.platform.startswith("win"):
+            GWL_STYLE = -16
+            WS_MINIMIZEBOX = 0x00020000
+            WS_MAXIMIZEBOX = 0x00010000
+            hwnd = ctypes.windll.user32.GetParent(self.winfo_id())
+            style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_STYLE)
+            style &= ~WS_MINIMIZEBOX
+            style &= ~WS_MAXIMIZEBOX
+            ctypes.windll.user32.SetWindowLongW(hwnd, GWL_STYLE, style)
+            ctypes.windll.user32.SetWindowPos(
+                hwnd, 0, 0, 0, 0, 0,
+                0x0002 | 0x0001 | 0x0040 | 0x0020
+            )
+
+    # Função para alterar barra de título:
+    def ativar_dark_titlebar_alerta(self):
+        self.update()
+        hwnd = ctypes.windll.user32.GetParent(self.winfo_id())
+
+        DWMWA_USE_IMMERSIVE_DARK_MODE = 20
+        valor = ctypes.c_int(1)
+
+        ctypes.windll.dwmapi.DwmSetWindowAttribute(
+            hwnd,
+            DWMWA_USE_IMMERSIVE_DARK_MODE,
+            ctypes.byref(valor),
+            ctypes.sizeof(valor)
+        )
+
+    def fecha_popup_alerta(self):
+        self.grab_release()
+        self.destroy()
+
 class Popup(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
@@ -127,14 +201,51 @@ class PopupEditar(tk.Toplevel):
     def __init__(self, master, area_dados):
         super().__init__(master)
 
-        self.area_dados = area_dados # referencia do textbox
+        self.area_dados = area_dados  # referencia do textbox
+
+        # Capturando e exibindo valor selecionado:
+        selecao = self.area_dados.tag_ranges("selecionado")
+        if selecao:
+            self.inicio = selecao[0]
+            self.fim = selecao[1]
+            texto_selecionado = self.area_dados.get(self.inicio, self.fim).strip()
+        else:
+            texto_selecionado = ""
 
         # Janela:
-        self.title("Editar")
+        self.title("Editar dado")
         self.attributes("-topmost", True)
         self.configure(bg="#2C2C2C")
 
-        self.verificar_texto() # vinculando operação desta função nesta classe
+        # Conteúdo da janela:
+        # -------------------------------------------------------------------
+        self.pergunta_editar = ctk.CTkLabel(
+            master=self,
+            text=f"Digite novo valor para '{texto_selecionado}':",
+            text_color="#FFFFFF"
+        )
+        self.pergunta_editar.pack(pady=(15, 2))
+
+        self.editar_item = ctk.CTkEntry(
+            master=self,
+            width=250,
+            height=28,
+            text_color="#000000",
+            fg_color="#FFFFFF"
+        )
+        self.editar_item.pack(pady=2)
+
+        self.btn_editar = ctk.CTkButton(
+            master=self,
+            width=100,
+            height=28,
+            text="Editar",
+            command=self.executar_edicao
+        )
+        self.btn_editar.pack(pady=(12, 2))
+        # -------------------------------------------------------------------
+
+        self.verificar_texto()
 
         # Ativando barra própria:
         if sys.platform.startswith("win"):
@@ -145,10 +256,10 @@ class PopupEditar(tk.Toplevel):
         self.grab_set()
         self.focus_force()
 
-        self.protocol("WM_DELETE_WINDOW", self.fecha_popup_edit)  # volta interatividade da interface
+        self.protocol("WM_DELETE_WINDOW", self.fecha_popup_edit)
 
         # Configuração de tamanho-centralização:
-        popup_width, popup_height = 350, 120
+        popup_width, popup_height = 350, 140
 
         tela_width = self.winfo_screenwidth()
         tela_height = self.winfo_screenheight()
@@ -191,7 +302,29 @@ class PopupEditar(tk.Toplevel):
             ctypes.sizeof(valor)
         )
 
-    # Função de interatividade popup editar-interface
+    # Função para editar dado:
+    def executar_edicao(self):
+
+        novo_texto = self.editar_item.get().strip()
+
+        if not novo_texto:
+            return
+
+        if not hasattr(self, "inicio") or not hasattr(self, "fim"):
+            print("Nenhum dado selecionado.")
+            return
+
+        EditarDado.editar(
+            self.area_dados,
+            self.inicio,
+            self.fim,
+            novo_texto
+        )
+
+        # Fecha o popup após editar
+        self.fecha_popup_edit()
+
+    # Função de interatividade popup editar-interface:
     def fecha_popup_edit(self):
         self.grab_release()
         self.destroy()
@@ -281,7 +414,7 @@ class Interface(ctk.CTk):
             text="Inserir",
             width=100,
             height=28,
-            command=lambda: InserirDado.inserir(self.entrada_dados, self.area_dados)  # especifica a classe, aciona a função e passa os objetos
+            command=self.acao_inserir  
         )
         self.btn_1.grid(row=0, column=0, pady=5, sticky="ew")  # expande horizontalmente
 
@@ -300,7 +433,7 @@ class Interface(ctk.CTk):
             text="Editar",
             width=100,
             height=28,
-            command=lambda: PopupEditar(self, self.area_dados)  # abre popup editar
+            command=self.acao_editar
         )
         self.btn_3.grid(row=2, column=0, pady=5, sticky="ew")  #  "            "
 
@@ -310,7 +443,7 @@ class Interface(ctk.CTk):
             text="Excluir",
             width=100,
             height=28,
-            command=lambda: ExcluirDado.excluir(self.area_dados)
+            command=self.acao_excluir
         )
         self.btn_4.grid(row=3, column=0, pady=5, sticky="ew")  #  "            "
 
@@ -331,6 +464,70 @@ class Interface(ctk.CTk):
         )
         self.info_sobre.grid(row=3, column=3, sticky="se", padx=15, pady=5)
         self.info_sobre.bind("<Button-1>", lambda e: Popup(self))  # abre janela popup
+
+    # -----------------------------------------------------------------
+    # Funções intermediárias para verificar se há dados no TextBox
+    # Se não houver dados, abre a janela de alerta (classe AlertaDados)
+    # -----------------------------------------------------------------
+
+    def verificar_area_dados(self):
+        # Verifica se o textbox está vazio:
+        texto = self.area_dados.get("1.0", "end").strip()
+
+        if not texto:
+            AlertaDados(self)  # chama janela de alerta
+            return False
+
+        return True
+
+    def acao_inserir(self):
+        # Verifica se há texto no campo de entrada:
+        texto = self.entrada_dados.get().strip()
+
+        if not texto:
+            mensagem = "Insira primeiro algum dado."
+            AlertaDados(self, mensagem)
+            return
+
+        InserirDado.inserir(self.entrada_dados, self.area_dados)
+
+    def acao_editar(self):
+
+        texto = self.area_dados.get("1.0", "end").strip()
+        selecao = self.area_dados.tag_ranges("selecionado")
+
+        # Não há nenhum dado:
+        if not texto:
+            mensagem = "Insira primeiro algum dado."
+            AlertaDados(self, mensagem)
+            return
+
+        # Há dados mas não há seleção:
+        if not selecao:
+            mensagem = "Para editar selecione algum dado."
+            AlertaDados(self, mensagem)
+            return
+
+        PopupEditar(self, self.area_dados)
+
+    def acao_excluir(self):
+
+        texto = self.area_dados.get("1.0", "end").strip()
+        selecao = self.area_dados.tag_ranges("selecionado")
+
+        # Não há nenhum dado:
+        if not texto:
+            mensagem = "Não há dados para excluir."
+            AlertaDados(self, mensagem)
+            return
+
+        # Há dados mas não há seleção:
+        if not selecao:
+            mensagem = "Para excluir selecione algum dado."
+            AlertaDados(self, mensagem)
+            return
+
+        ExcluirDado.excluir(self.area_dados)
 
     def remover_selecao(self, event):
         # Descobre qual widget está exatamente na posição clicada:
