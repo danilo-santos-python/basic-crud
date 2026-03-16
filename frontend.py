@@ -4,7 +4,7 @@ import ctypes                     # acesso aos recursos do sistema operacional
 import sys                        # acesso à variáveis do sistema
 import os                         # acesso aos diretórios
 
-from backend import InserirDado, SelecionarLinha, EditarDado, ExcluirDado   # importando funções externas (arquivo backend.py)
+from backend import InserirDado, SelecionarLinha, SelecionarArquivo, EditarDado, ExcluirDado   # importando funções externas (arquivo backend.py)
 
 ctk.set_appearance_mode("dark")  # definindo aparência
 
@@ -421,9 +421,10 @@ class Interface(ctk.CTk):
         # Criando botão 2:
         self.btn_2 = ctk.CTkButton(
             master=self.frame_botoes,
-            text="Ler/Carregar",
+            text="Carregar",
             width=100,
-            height=28
+            height=28,
+            command=self.carregar_dados
         )
         self.btn_2.grid(row=1, column=0, pady=5, sticky="ew")  # expande horizontalmente
 
@@ -490,6 +491,10 @@ class Interface(ctk.CTk):
             return
 
         InserirDado.inserir(self.entrada_dados, self.area_dados)
+
+    def carregar_dados(self):
+
+        SelecionarArquivo.importar_arquivo(self.area_dados)
 
     def acao_editar(self):
 

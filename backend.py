@@ -1,4 +1,5 @@
 # Funções dos botões:
+from tkinter import filedialog
 
 class InserirDado():  # inserir = btn_1
     @staticmethod
@@ -23,7 +24,7 @@ class InserirDado():  # inserir = btn_1
 
         print(f"Inserido: {texto}")
 
-class SelecionarLinha():  # selecionar dado inserido
+class SelecionarLinha():  # selecionar dado na lista
     @staticmethod
     def selecionar(event, area_dados):
         index = area_dados.index(f"@{event.x},{event.y}")
@@ -53,6 +54,39 @@ class SelecionarLinha():  # selecionar dado inserido
     @staticmethod
     def limpar_selecao(area_dados):
         area_dados.tag_remove("selecionado", "1.0", "end")
+
+class SelecionarArquivo():  # carregar = btn_2
+    @staticmethod
+    def importar_arquivo(area_dados):
+
+        caminho = filedialog.askopenfilename(
+            title="Selecione um arquivo",
+            filetypes=[
+                ("Arquivos de texto", "*.txt"),
+                ("Arquivos Python", "*.py"),
+                ("Todos arquivos", "*.*")
+            ]
+        )
+
+        if not caminho:
+            return
+
+        with open(caminho, "r", encoding="utf-8") as arquivo:
+            conteudo = arquivo.read()
+
+        # Habilita textbox:
+        area_dados.configure(state="normal")
+
+        # Limpa conteúdo:
+        area_dados.delete("1.0", "end")
+
+        # Insere conteúdo:
+        area_dados.insert("1.0", conteudo)
+
+        # Bloqueia novamente:
+        area_dados.configure(state="disabled")
+
+        print(f"Arquivo carregado: {caminho}")
 
 class EditarDado(): # editar = btn_3
     @staticmethod
