@@ -4,7 +4,7 @@ import ctypes                     # acesso aos recursos do sistema operacional
 import sys                        # acesso à variáveis do sistema
 import os                         # acesso aos diretórios
 
-from backend import InserirDado, SelecionarLinha, SelecionarArquivo, EditarDado, ExcluirDado   # importando funções externas (arquivo backend.py)
+from backend import InserirDado, SelecionarLinha, SelecionarArquivo, ApagarDados, EditarDado, ExcluirDado   # importando funções externas (arquivo backend.py)
 
 ctk.set_appearance_mode("dark")  # definindo aparência
 
@@ -448,6 +448,16 @@ class Interface(ctk.CTk):
         )
         self.btn_4.grid(row=3, column=0, pady=5, sticky="ew")  #  "            "
 
+        # Criando botão 5:
+        self.btn_5 = ctk.CTkButton(
+            master=self.frame_botoes,
+            text="Limpar",
+            width=100,
+            height=28,
+            command=self.apagar_dados
+        )
+        self.btn_5.grid(row=4, column=0, pady=5, sticky="ew")  #  "            "
+
         # Criando um frame para link:
         self.frame_link = ctk.CTkFrame(
             master=self.frame_principal,
@@ -533,6 +543,18 @@ class Interface(ctk.CTk):
             return
 
         ExcluirDado.excluir(self.area_dados)
+
+    def apagar_dados(self):
+
+        texto = self.area_dados.get("1.0", "end").strip()
+
+        # Não há nenhum dado:
+        if not texto:
+            mensagem = "Não há dados para limpar."
+            AlertaDados(self, mensagem)
+            return
+
+        ApagarDados.limpar_dados(self.area_dados)
 
     def remover_selecao(self, event):
         # Descobre qual widget está exatamente na posição clicada:

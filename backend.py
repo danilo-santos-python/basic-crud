@@ -88,6 +88,21 @@ class SelecionarArquivo():  # carregar = btn_2
 
         print(f"Arquivo carregado: {caminho}")
 
+class ApagarDados(): # limpar = btn_5
+    @staticmethod
+    def limpar_dados(area_dados):
+        
+        # Habilita textbox:
+        area_dados.configure(state="normal")
+
+        # Limpa conteúdo:
+        area_dados.delete("1.0", "end")
+
+        # Bloqueia novamente:
+        area_dados.configure(state="disabled")
+
+        print("Conteúdo apagado.")
+
 class EditarDado(): # editar = btn_3
     @staticmethod
     def editar(area_dados, inicio, fim, novo_texto):
