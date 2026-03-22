@@ -46,7 +46,7 @@ class AlertaDados(tk.Toplevel):
 
         self.mensagem_alerta = ctk.CTkLabel(
             master=self,
-            text=mensagem,
+            text=mensagem,  # variável que troca de valor (no caso, 'string') a cada situação
             text_color="#FFFFFF"
         )
         self.mensagem_alerta.pack(pady=(30, 2))
@@ -110,7 +110,7 @@ class AlertaDados(tk.Toplevel):
         self.grab_release()
         self.destroy()
 
-class Popup(tk.Toplevel):
+class PopupSobre(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
 
@@ -474,7 +474,7 @@ class Interface(ctk.CTk):
             font=ctk.CTkFont(size=13)
         )
         self.info_sobre.grid(row=3, column=3, sticky="se", padx=15, pady=5)
-        self.info_sobre.bind("<Button-1>", lambda e: Popup(self))  # abre janela popup
+        self.info_sobre.bind("<Button-1>", lambda e: PopupSobre(self))  # abre janela popup
 
     # -----------------------------------------------------------------
     # Funções intermediárias para verificar se há dados no TextBox

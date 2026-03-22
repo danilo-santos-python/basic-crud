@@ -1,15 +1,11 @@
 # Funções dos botões:
-from tkinter import filedialog
+from tkinter import filedialog  # importando recurso do sistema (window file)
 
 class InserirDado():  # inserir = btn_1
     @staticmethod
     def inserir(entrada_dados, area_dados):
 
         texto = entrada_dados.get().strip()  # captura e remove espaços extras
-
-        if not texto:
-            print("Nada inserido no campo.")
-            return  # evita inserir vazio
 
         # Libera temporariamente para inserção:
         area_dados.configure(state="normal")
@@ -77,10 +73,10 @@ class SelecionarArquivo():  # carregar = btn_2
         # Habilita textbox:
         area_dados.configure(state="normal")
 
-        # Limpa conteúdo:
+        # Limpa conteúdo atual:
         area_dados.delete("1.0", "end")
 
-        # Insere conteúdo:
+        # Insere conteúdo novo:
         area_dados.insert("1.0", conteudo)
 
         # Bloqueia novamente:
@@ -88,28 +84,9 @@ class SelecionarArquivo():  # carregar = btn_2
 
         print(f"Arquivo carregado: {caminho}")
 
-class ApagarDados(): # limpar = btn_5
-    @staticmethod
-    def limpar_dados(area_dados):
-        
-        # Habilita textbox:
-        area_dados.configure(state="normal")
-
-        # Limpa conteúdo:
-        area_dados.delete("1.0", "end")
-
-        # Bloqueia novamente:
-        area_dados.configure(state="disabled")
-
-        print("Conteúdo apagado.")
-
 class EditarDado(): # editar = btn_3
     @staticmethod
     def editar(area_dados, inicio, fim, novo_texto):
-
-        if not novo_texto.strip():
-            print("Novo valor vazio.")
-            return
 
         # Habilita edição:
         area_dados.configure(state="normal")
@@ -161,3 +138,18 @@ class ExcluirDado():  # excluir = btn_4
         area_dados.configure(state="disabled")
 
         print(f"Excluído: {texto_excluido}")
+
+class ApagarDados(): # limpar = btn_5
+    @staticmethod
+    def limpar_dados(area_dados):
+        
+        # Habilita textbox:
+        area_dados.configure(state="normal")
+
+        # Limpa conteúdo:
+        area_dados.delete("1.0", "end")
+
+        # Bloqueia novamente:
+        area_dados.configure(state="disabled")
+
+        print("Conteúdo apagado.")
