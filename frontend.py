@@ -163,7 +163,7 @@ class PopupSobre(tk.Toplevel):
         info = (
             "CRUD de funcionamento básico\n\n"
             "Interface: Biblioteca CustomTkinter\n"
-            "Arquivos: Este app usa arquivos .py e .txt\n"
+            "Arquivos: .py .exe .txt .ico .png\n"
             "Desenvolvedor: Danilo dos Santos Soares\n"
             "Contato: (11) 9 4138-3504\n\n"
             "© 2026 - Todos os direitos reservados."
