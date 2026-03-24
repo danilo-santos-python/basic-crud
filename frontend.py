@@ -162,8 +162,8 @@ class PopupSobre(tk.Toplevel):
         # Conteúdo da janela:
         info = (
             "CRUD de funcionamento básico\n\n"
-            "Interface: Biblioteca CustomTkinter\n"
-            "Arquivos: .py .exe .txt .ico .png\n"
+            "Manipulação de dados sem memória\n"
+            "Interface: Python + CustomTkinter\n"
             "Desenvolvedor: Danilo dos Santos Soares\n"
             "Contato: (11) 9 4138-3504\n\n"
             "© 2026 - Todos os direitos reservados."
