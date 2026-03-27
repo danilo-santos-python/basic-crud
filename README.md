@@ -34,22 +34,22 @@ O sistema permite inserir, visualizar, editar, excluir e carregar dados a partir
 ---
 
 ## 🧱 Estrutura do projeto
-
+```
 📂 basic-crud/
 │
-├── frontend.py # Interface gráfica (UI)
-├── backend.py # Lógica das operações (CRUD)
-├── 📂 assets/ # Ícones da aplicação
+├── frontend.py        # Interface gráfica (UI)
+├── backend.py         # Lógica das operações (CRUD)
+├── 📂 assets/         # Ícones da aplicação
 │ ├── list.ico
 │ └── list.png
-├── 📂 data/ # Dados para carregar (Exemplos)
+├── 📂 data/           # Dados para carregar (Exemplos)
 │ ├── characters.txt
 │ ├── names.txt
 │ └── numbers.txt
-├── 📂 dist/ # Executável do projeto
+├── 📂 dist/           # Executável do projeto
 │ └── Basic Crud.exe
-└── README.md # Documentação do projeto
-
+└── README.md           # Documentação do projeto
+```
 ---
 
 ## 🧠 Arquitetura
