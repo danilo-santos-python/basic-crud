@@ -1,5 +1,6 @@
 venv/
 __pycache__/
 *.pyc
+build/
+Basic Crud.spec
 exemplos_construcao/
-registro.txt
