@@ -35,20 +35,20 @@ O sistema permite inserir, visualizar, editar, excluir e carregar dados a partir
 
 ## 🧱 Estrutura do projeto
 
-/project
-
+📂 basic-crud/
+│
 ├── frontend.py         # Interface gráfica (UI)
 ├── backend.py          # Lógica das operações (CRUD)
-├── assets/             # Ícones da aplicação
+├── 📂 assets/             # Ícones da aplicação
 │   ├── list.ico
 │   └── list.png
-├── data/               # Dados para carregar (Exemplos)
+├── 📂 data/               # Dados para carregar (Exemplos)
 │   ├── characters.txt
 │   ├── names.txt
 │   └── numbers.txt
-├── dist/               # Executável do projeto
+├── 📂 dist/               # Executável do projeto
 │   └── Basic Crud.exe
-├── README.md           # Documentação do projeto
+└── README.md           # Documentação do projeto
 
 ---
 
@@ -65,11 +65,11 @@ O projeto segue uma separação simples entre:
 
 1. Instale as dependências:
 
-pip install customtkinter
+- pip install customtkinter
 
 2. Execute o projeto:
 
-python frontend.py
+- python frontend.py
 
 ---
 
